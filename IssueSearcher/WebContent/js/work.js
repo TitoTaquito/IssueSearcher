@@ -3,8 +3,8 @@
  */
 //getIssues();
 var totalIssues;
-var per_page=30;
 var page=1;
+var per_page=30;
 writeToScreen();
 //document.write(getDate());
 
@@ -34,15 +34,31 @@ function writeToScreen(){
 			per_page=per_page.split("&")[0];
 		}
 	}
-	var obj = getIssues(page,per_page);
+	var obj = getIssues(page);
 	document.write("<div>"+obj.length+" out of "+totalIssues+" total issues.</div>");
 	writePaging("top",per_page);
 	writeObjects(obj);
 	writePaging("bot",per_page);
 }
 
-function writePaging(part,per_page){
-	document.write("<div><< < <input type=\"number\" id=\"paging"+part+"\" name=\"page"+part+"\" value=\""+page+"\"> > >></div>");
+function writePaging(part){
+	var line = "<div>";
+	var lastPage = Math.floor(totalIssues/per_page);
+	if(totalIssues%per_page!==0){
+		lastPage++;
+	}
+	if(page != 1){
+		line+="<a href=\"Issues.html?pp="+per_page+"&pg="+1+"&ttlIss="+totalIssues+"\"><<</a> ";
+		line+= "<a href=\"Issues.html?pp="+per_page+"&pg="+(page-1)+"&ttlIss="+totalIssues+"\"><</a> ";
+	}
+	
+	line+="<input type=\"number\" id=\"paging"+part+"\" name=\"page"+part+"\" value=\""+page+"\">";
+	if(page !=lastPage){
+		line+="<a href=\"Issues.html?pp="+per_page+"&pg="+(parseInt(page)+1)+"&ttlIss="+totalIssues+"\">></a> ";
+		line+="<a href=\"Issues.html?pp="+per_page+"&pg="+lastPage+"&ttlIss="+totalIssues+"\">>></a>"
+	}
+	line+="</div>";
+	document.write(line);
 	document
 	document.getElementById("paging"+part).addEventListener("keyup", function(event) {
 	    event.preventDefault();
@@ -50,6 +66,9 @@ function writePaging(part,per_page){
 	    	//document.write("http://localhost:8080/IssueSearcher/Issues.html?pp="+per_page+"&pg="+page+"&ttlIss="+totalIssues);
 		    var newPage = document.getElementById("paging"+part).value;
 		    if(newPage && page != newPage){
+		    	if(newPage>lastPage){
+		    		newPage=lastPage;
+		    	}
 		    	window.location.href = "http://localhost:8080/IssueSearcher/Issues.html?pp="+per_page+"&pg="+newPage+"&ttlIss="+totalIssues;
 		    }
 	    }
