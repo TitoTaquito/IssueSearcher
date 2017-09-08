@@ -20,8 +20,17 @@ function writeToScreen(){
 	var per_page=30;
 	var page=1;
 	params = params.split("?")[1];
-	if(params){
-		
+	if(params&&params.includes("pg=")){
+		page=params.split("pg=")[1];
+		if(page.includes("&")){
+			page=page.split("&")[0];
+		}
+	}
+	if(params&&params.includes("pp=")){
+		per_page=params.split("pp=")[1];
+		if(per_page.includes("&")){
+			per_page=per_page.split("&")[0];
+		}
 	}
 	var obj = getIssues(1,100);
 	document.write("<div>"+obj.length+" out of "+totalIssues+" total issues.</div>");
