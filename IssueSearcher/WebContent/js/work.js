@@ -3,6 +3,8 @@
  */
 //getIssues();
 var totalIssues;
+var per_page=30;
+var page=1;
 writeToScreen();
 //document.write(getDate());
 
@@ -15,10 +17,10 @@ function getIssues(page,per_page){
 }
 
 function writeToScreen(){
-	var totalIssues = getTotalIssues();
+	totalIssues = getTotalIssues();
 	var params=window.location.href;
-	var per_page=30;
-	var page=1;
+	per_page=30;
+	page=1;
 	params = params.split("?")[1];
 	if(params&&params.includes("pg=")){
 		page=params.split("pg=")[1];
@@ -32,9 +34,26 @@ function writeToScreen(){
 			per_page=per_page.split("&")[0];
 		}
 	}
-	var obj = getIssues(1,100);
+	var obj = getIssues(page,per_page);
 	document.write("<div>"+obj.length+" out of "+totalIssues+" total issues.</div>");
+	writePaging("top",per_page);
 	writeObjects(obj);
+	writePaging("bot",per_page);
+}
+
+function writePaging(part,per_page){
+	document.write("<div><< < <input type=\"number\" id=\"paging"+part+"\" name=\"page"+part+"\" value=\""+page+"\"> > >></div>");
+	document
+	document.getElementById("paging"+part).addEventListener("keyup", function(event) {
+	    event.preventDefault();
+	    if (event.keyCode == 13) {
+	    	//document.write("http://localhost:8080/IssueSearcher/Issues.html?pp="+per_page+"&pg="+page+"&ttlIss="+totalIssues);
+		    var newPage = document.getElementById("paging"+part).value;
+		    if(newPage && page != newPage){
+		    	window.location.href = "http://localhost:8080/IssueSearcher/Issues.html?pp="+per_page+"&pg="+newPage+"&ttlIss="+totalIssues;
+		    }
+	    }
+	});
 }
 
 function getTotalIssues(){
