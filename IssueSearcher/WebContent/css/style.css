@@ -1,0 +1,62 @@
+@charset "ISO-8859-1";
+input[type="number"] {
+    width: 60px;
+    border: 4px solid #cca1a1;
+    border-radus: 100px;
+    border-style:ridge;
+    align-text: center;
+    color:black;
+    padding:3px;
+}
+
+h3{
+	padding-top:0;
+	margin-top:10px;
+}
+
+h1.header{
+    margin: 5px;
+    padding:5px;
+    width:fit-content;
+    color:white;
+}
+
+div{
+	font:40px;
+	font-size:medium;
+}
+
+div#bodyContainer{
+	background:#da6b55;
+	margin:40px;
+	padding:20px;
+	color:white;
+	text-align:left;
+}
+
+
+
+div.issue{
+	border: 4px solid #c17171;
+	margin: 4px;
+	background:#6b9094;
+}
+
+body{
+	background:#93b1C6;
+}
+
+.headCont{
+	border: px solid #ccc;
+	background:#333;
+	margin:0px;
+	padding-bottom: 7px;
+	padding-top:2px;
+	align-text: center;
+}
+
+p{
+	padding:0px;
+	margin:0px;
+	color:white;
+}
