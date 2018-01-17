@@ -1,47 +1,66 @@
 /**
+ * Author: Charles Spencer
+ * Latest update: 1/16/18
+ *
+ * Flow:
  * 
+ * writeToScreen->
+ * 		getTotalIssues->
+ *			getDate(optional)
+ *		getIssues->
+ *			getDate
+ * 		writePerPage
+ * 		writePaging
+ * 		writeObjects->
+ *			writeObject
+ * 		writePaging
  */
-//getIssues();
 var totalIssues;
 var page=1;
 var per_page=30;
 writeToScreen();
-//document.write(getDate());
 
+//makes the call to the github api
+//returns: (obj) the array of issues to be written to the screen
 function getIssues(){
 	var xmlHttp = new XMLHttpRequest();
-	xmlHttp.open( "GET", "https://api.github.com/repos/angular/angular/issues?per_page="+per_page+"&page="+page+"&since="+getDate(), false ); 
-	xmlHttp.send( null );
+	xmlHttp.open( "GET", "https://api.github.com/repos/angular/angular/issues?per_page="+per_page+"&page="+page+"&since="+getDate(), false ); //formulates by page number.
+	xmlHttp.send( null );//note returns max of 100 though there may be more
 	var obj = JSON.parse(xmlHttp.responseText);
 	return obj;
 }
 
+//Original call from the webpage. Does most of the calls to the various functions.
 function writeToScreen(){
 	totalIssues = getTotalIssues();
-	var params=window.location.href;
+	var params=window.location.href; 
 	per_page=30;
 	page=1;
 	params = params.split("?")[1];
+	//find the current page from the url
 	if(params&&params.includes("pg=")){
 		page=params.split("pg=")[1];
 		if(page.includes("&")){
 			page=page.split("&")[0];
 		}
 	}
+	//find the current "per_page" from the url
 	if(params&&params.includes("pp=")){
 		per_page=params.split("pp=")[1];
 		if(per_page.includes("&")){
 			per_page=per_page.split("&")[0];
 		}
 	}
-	//document.write("<div>Issues Per Page: <input type=\"number\" id=\"per_page_count\" value=\""+per_page+"\"></div>");
 	var obj = getIssues();
 	writePerPage(obj.length);
-	writePaging("top",per_page);
+	writePaging("top");
 	writeObjects(obj);
-	writePaging("bot",per_page);
+	writePaging("bot");
 }
 
+//writes the part of the page that controls how many issues are displayed per page.
+//param:
+//  len: the number of issues per page
 function writePerPage(len){
 	document.write("<div>"+len+" out of "+totalIssues+" total issues.</div>");
 	document.write("<div>Issues Per Page: <input type=\"number\" id=\"per_page_count\" value=\""+per_page+"\"></div>");
@@ -61,6 +80,9 @@ function writePerPage(len){
 	});
 }
 
+//writes the part of the webpage that allows paging
+//param: 
+//	"part": either "top" or "bot" for id purposes on the tags
 function writePaging(part){
 	var line = "<div align=\"center\" class=\"pagingContainer\">";
 	var lastPage = Math.floor(totalIssues/per_page);
@@ -94,12 +116,17 @@ function writePaging(part){
 	});
 }
 
+//returns the TotalNumber of issues
+//return:
+//  case 1: url: total issues extracted from the url
+//	case 2:	sum: total number of issues from multiple calls to the api.
 function getTotalIssues(){
 	var sum = 0;
 	var obj;
 	var i=1;
 	var url=window.location.href;
 	url = url.split("?")[1];
+	//case1: we've already done the work of calling the repo and now we need to extract the info from our url.
 	if(url&&url.includes("ttlIss")){
 		url=url.split("ttlIss=")[1];
 		if(url.includes("&")){
@@ -107,6 +134,8 @@ function getTotalIssues(){
 		}
 		return url;
 	}
+	//case2: we need to call each page until we run out of issues as each of the calls.  
+	//Note: This is an extremely low effeciency function so we want to reduce this case as much as possible. If there are 400 issues open then this case makes 4 calls to the api. 
 	while(true){
 		var xmlHttp = new XMLHttpRequest();
 		xmlHttp.open( "GET", "https://api.github.com/repos/angular/angular/issues?per_page=100&page="+i+"&since="+getDate(), false ); 
@@ -122,10 +151,15 @@ function getTotalIssues(){
 	return sum;
 }
 
+//Returns the date of a long time ago so that we can recieve all issues
 function getDate(){
 	return new Date((new Date()).getTime()-(60*60*24*7*1000)).toISOString();
 }
 
+//Physically writes an issue to the page.  Contains the HTML of the issue info that we write to the document
+//params:
+//  obj: The array of issues from the api call. 
+//  num: the index of the individual issue that needs to be written to the screen from the "obj" array;
 function writeObject(obj,num){
 	var use = obj[num];
 	document.write("<div class=\"issue\">" +
@@ -141,9 +175,12 @@ function writeObject(obj,num){
 			"</div>");
 }
 
+//Writes each object from the 
+//Params:
+//	obj: The array of issues from the api call.
 function writeObjects(obj){
 	var i=0;
-	while(i<obj.length){
+	while(i<obj.length/2){
 		writeObject(obj,i);
 		i++;
 	}
